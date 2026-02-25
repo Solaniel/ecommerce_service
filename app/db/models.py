@@ -1,9 +1,9 @@
 from typing import List
 from typing import Optional
+from decimal import Decimal
 from sqlalchemy import ForeignKey
 from sqlalchemy import String
 from sqlalchemy import Text
-from sqlalchemy import Decimal
 from sqlalchemy import Numeric
 
 
@@ -75,5 +75,4 @@ class Category(Base):
     products: Mapped[List["Product"]] = relationship(
         "Product",
         back_populates="category",
-        cascade="all"
     )

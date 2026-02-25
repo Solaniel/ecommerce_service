@@ -1,0 +1,39 @@
+from __future__ import annotations
+
+from typing import Optional
+
+from pydantic import BaseModel, ConfigDict, Field, HttpUrl
+from pydantic.types import condecimal
+
+
+Money = condecimal(max_digits=12, decimal_places=2, ge=0)
+
+
+class ProductBase(BaseModel):
+    sku: str = Field(min_length=1, max_length=64)
+    title: str = Field(min_length=1, max_length=255)
+    description: Optional[str] = None
+
+    image: Optional[HttpUrl] = None
+
+    price: Money
+    category_id: int
+
+
+class ProductCreate(ProductBase):
+    pass
+
+
+class ProductUpdate(BaseModel):
+    sku: Optional[str] = Field(default=None, min_length=1, max_length=64)
+    title: Optional[str] = Field(default=None, min_length=1, max_length=255)
+    description: Optional[str] = None
+    image: Optional[HttpUrl] = None
+    price: Optional[Money] = None
+    category_id: Optional[int] = None
+
+
+class ProductRead(ProductBase):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
