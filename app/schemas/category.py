@@ -18,5 +18,15 @@ class CategoryUpdate(BaseModel):
 
 class CategoryRead(CategoryBase):
     model_config = ConfigDict(from_attributes=True)
-
     id: int
+    children: list[CategoryChildRead]
+
+class CategoryChildRead(BaseModel):
+    name: str = Field(min_length=1, max_length=255)
+    id: int
+
+# Usefull for displaying categories inside the product, but not their children.
+class CategoryMiniRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    name: str

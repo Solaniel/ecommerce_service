@@ -5,6 +5,8 @@ from typing import Optional
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl
 from pydantic.types import condecimal
 
+from app.schemas.category import CategoryMiniRead
+
 
 Money = condecimal(max_digits=12, decimal_places=2, ge=0)
 
@@ -37,3 +39,4 @@ class ProductRead(ProductBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    category: Optional[CategoryMiniRead] = None
