@@ -12,7 +12,7 @@ class CategoryCreate(CategoryBase):
 
 
 class CategoryUpdate(BaseModel):
-    name: Optional[str] = Field(default=None, min_length=1, max_length=255)
+    name: str = Field(default=None, min_length=1, max_length=255)
     parent_id: Optional[int] = None
 
 
