@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl
@@ -42,10 +43,10 @@ class ProductRead(ProductBase):
     category: Optional[CategoryMiniRead] = None
 
 class ProductParams(BaseModel):
-    title: str = Field(default=None, min_length=1, max_length=255)
-    sku: str = Field(default=None, min_length=1, max_length=64)
-    min_price: int = Field(default=None, ge=0)
-    max_price: int = Field(default=None)
-    category_id: int = Field(default=None, gt=0)
-    limit: int = Field(100, gt=0, le=100)
-    offset: int = Field(0, ge=0)
+    title: Optional[str] = Field(default=None, min_length=1, max_length=255)
+    sku: Optional[str] = Field(default=None, min_length=1, max_length=64)
+    min_price: Optional[Decimal] = Field(default=None, ge=0)
+    max_price: Optional[Decimal] = Field(default=None, ge=0)
+    category_id: Optional[int] = Field(default=None, gt=0)
+    limit: Optional[int] = Field(100, gt=0, le=100)
+    offset: Optional[int] = Field(0, ge=0)

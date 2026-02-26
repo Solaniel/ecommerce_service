@@ -12,7 +12,6 @@ def sku_validation(db: Session, sku: str):
     return None
 
 def category_validation(db: Session, category_id: int):
-    print("inside")
     category_exists = db.execute(select(Category.id).where(Category.id == category_id)).scalar_one_or_none()
     if category_exists is None:
         return {"field": "category_id", "message": f"category_id={category_id} does not exist"}

@@ -28,13 +28,11 @@ def create_product_crud(db: Session, payload: ProductCreate):
         valid_sku = sku_validation(db, sku=data["sku"])
         if valid_sku is not None:
             errors.append(valid_sku)
-    # Casting to string, because it is always present and it can be 0 and this is false by default.
-    if str(data.get("category_id")):
+    if data.get("category_id") is not None:
         valid_category = category_validation(db, data["category_id"])
         if valid_category is not None:
             errors.append(valid_category)
     if errors:
-        print(f"Errors: {errors}")
         raise ValidationErrors(errors)
 
     # Creating the product.
@@ -68,7 +66,6 @@ def update_product_crud(db: Session, id: int, payload: ProductUpdate) -> Product
         if valid_category is not None:
             errors.append(valid_category)
     if errors:
-        print(f"Errors: {errors}")
         raise ValidationErrors(errors)
 
     # Updating the product.
@@ -87,7 +84,7 @@ def update_product_crud(db: Session, id: int, payload: ProductUpdate) -> Product
     return product
 
 def delete_product_crud(db: Session, id: int) -> None:
-    statement = select(Product).where(Product.id == id).options(selectinload(Product.category))
+    statement = select(Product).where(Product.id == id)
     product = db.execute(statement).scalars().one_or_none()
     if product is None:
         return None
@@ -104,15 +101,15 @@ def search_for_product(db: Session, query: ProductParams):
         statement = statement.where(Product.title.ilike(f"%{query.title}%"))
     if query.sku:
         statement = statement.where(Product.sku == query.sku)
-    if query.min_price:
-        statement = statement.where(Product.price >= query.min_price)
-    if query.max_price:
-        statement = statement.where(Product.price <= query.max_price)
-    if query.category_id:
-        statement = statement.where(Product.category_id == query.category_id)
-    if query.min_price and query.max_price:
+    if query.min_price is not None and query.max_price is not None:
         if query.min_price > query.max_price:
-            raise ValidationErrors({"field": "min_price & max_price", "message": f"min_price cannot be higher than max_price."})
+            raise ValidationErrors([{"field": "min_price & max_price", "message": f"min_price cannot be higher than max_price."}])
+    if query.min_price is not None:
+        statement = statement.where(Product.price >= query.min_price)
+    if query.max_price is not None:
+        statement = statement.where(Product.price <= query.max_price)
+    if query.category_id is not None:
+        statement = statement.where(Product.category_id == query.category_id)
     statement = statement.order_by(Product.id)
     statement = statement.offset(query.offset).limit(query.limit)
     return db.execute(statement).scalars().all()

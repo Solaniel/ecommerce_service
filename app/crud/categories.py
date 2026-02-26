@@ -44,8 +44,9 @@ def update_category_crud(db: Session, id: int, payload: CategoryUpdate) -> Categ
     if errors:
         raise ValidationErrors(errors)
     
-    category.parent_id = payload.parent_id
-    category.name = payload.name
+    updates = payload.model_dump(exclude_unset=True)
+    for key, value in updates.items():
+        setattr(category, key, value)
 
     try:
         db.commit()
