@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.api.deps import get_db
-from app.crud.categories import create_category_crud, list_all_categories, list_specific_category, update_category_crud
+from app.crud.categories import create_category_crud, delete_category_crud, list_all_categories, list_specific_category, update_category_crud
 from app.schemas.category import CategoryCreate, CategoryRead, CategoryUpdate
 
 router = APIRouter(
@@ -24,3 +24,7 @@ def create_category(category: CategoryCreate, db: Session = Depends(get_db)):
 @router.patch("/{category_id}", response_model=CategoryRead)
 def update_category_by_id(category_id: int, category: CategoryUpdate, db: Session = Depends(get_db)):
     return update_category_crud(db, category_id, category)
+
+@router.delete("/{category_id}")
+def delete_category_by_id(category_id: int, db: Session = Depends(get_db)):
+    delete_category_crud(db, category_id)

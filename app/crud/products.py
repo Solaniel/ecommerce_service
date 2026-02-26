@@ -85,3 +85,15 @@ def update_product_crud(db: Session, id: int, payload: ProductUpdate) -> Product
 
     db.refresh(product)
     return product
+
+def delete_product_crud(db: Session, id: int) -> None:
+    statement = select(Product).where(Product.id == id).options(selectinload(Product.category))
+    product = db.execute(statement).scalars().one_or_none()
+    if product is None:
+        return None
+    db.delete(product)
+    try:
+        db.commit()
+    except IntegrityError as e:
+        db.rollback()
+        raise IntegrityError("Integrity error while deleting product", e.params, e.orig)

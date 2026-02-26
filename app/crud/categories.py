@@ -54,3 +54,15 @@ def update_category_crud(db: Session, id: int, payload: CategoryUpdate) -> Categ
         raise IntegrityError("Integrity error while updating category", e.params, e.orig)
     db.refresh(category)
     return category
+
+def delete_category_crud(db: Session, id: int) -> None:
+    statement = select(Category).where(Category.id == id)
+    category = db.execute(statement).scalars().one_or_none()
+    if category is None:
+        return None
+    db.delete(category)
+    try:
+        db.commit()
+    except IntegrityError as e:
+        db.rollback()
+        raise IntegrityError("Integrity error while deleting category", e.params, e.orig)
