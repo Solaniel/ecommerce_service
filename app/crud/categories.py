@@ -8,8 +8,8 @@ from sqlalchemy import select
 from app.schemas.category import CategoryCreate, CategoryUpdate
 
 def list_all_categories(db: Session) -> list[Category]:
-    query = select(Category).options(selectinload(Category.children))
-    return db.execute(query).scalars().all()
+    statement = select(Category).options(selectinload(Category.children))
+    return db.execute(statement).scalars().all()
 
 def list_specific_category(db: Session, id: int) -> Category:
     statement = select(Category).where(Category.id == id).options(selectinload(Category.children))

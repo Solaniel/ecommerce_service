@@ -6,16 +6,16 @@ from app.crud.validations import category_validation, sku_validation
 from app.db.models import Product
 from sqlalchemy import select
 
-from app.schemas.product import ProductCreate, ProductUpdate
+from app.schemas.product import ProductCreate, ProductParams, ProductUpdate
 
 
 def list_all_products(db: Session) -> list[Product]:
-    query = select(Product).options(selectinload(Product.category))
-    return db.execute(query).scalars().all()
+    statement = select(Product).options(selectinload(Product.category))
+    return db.execute(statement).scalars().all()
 
 def list_specific_product(db: Session, id: int) -> Product:
-    query = select(Product).where(Product.id == id).options(selectinload(Product.category))
-    return db.execute(query).scalars().one_or_none()
+    statement = select(Product).where(Product.id == id).options(selectinload(Product.category))
+    return db.execute(statement).scalars().one_or_none()
 
 def create_product_crud(db: Session, payload: ProductCreate):
     errors = []
@@ -97,3 +97,22 @@ def delete_product_crud(db: Session, id: int) -> None:
     except IntegrityError as e:
         db.rollback()
         raise IntegrityError("Integrity error while deleting product", e.params, e.orig)
+
+def search_for_product(db: Session, query: ProductParams):
+    statement = select(Product).options(selectinload(Product.category))
+    if query.title:
+        statement = statement.where(Product.title.ilike(f"%{query.title}%"))
+    if query.sku:
+        statement = statement.where(Product.sku == query.sku)
+    if query.min_price:
+        statement = statement.where(Product.price >= query.min_price)
+    if query.max_price:
+        statement = statement.where(Product.price <= query.max_price)
+    if query.category_id:
+        statement = statement.where(Product.category_id == query.category_id)
+    if query.min_price and query.max_price:
+        if query.min_price > query.max_price:
+            raise ValidationErrors({"field": "min_price & max_price", "message": f"min_price cannot be higher than max_price."})
+    statement = statement.order_by(Product.id)
+    statement = statement.offset(query.offset).limit(query.limit)
+    return db.execute(statement).scalars().all()

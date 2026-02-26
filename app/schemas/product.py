@@ -40,3 +40,12 @@ class ProductRead(ProductBase):
 
     id: int
     category: Optional[CategoryMiniRead] = None
+
+class ProductParams(BaseModel):
+    title: str = Field(default=None, min_length=1, max_length=255)
+    sku: str = Field(default=None, min_length=1, max_length=64)
+    min_price: int = Field(default=None, ge=0)
+    max_price: int = Field(default=None)
+    category_id: int = Field(default=None, gt=0)
+    limit: int = Field(100, gt=0, le=100)
+    offset: int = Field(0, ge=0)

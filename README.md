@@ -44,5 +44,4 @@ docker compose up -d
 
 ### 5. Run the API
 
-uvicorn app.main:app --reload
-
+fastapi run dev
